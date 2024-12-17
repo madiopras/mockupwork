@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unggah Call List INCITEL ke Kampanye CXOne</title>
+    <!-- Link ke Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      // Simulasi data call list untuk masing-masing call list
+      const callListsData = {
+        call_list_1: {
+          totalContact: 150,
+        },
+        call_list_2: {
+          totalContact: 200,
+        },
+        call_list_3: {
+          totalContact: 120,
+        },
+      };
+
+      // Fungsi untuk mencari kampanye berdasarkan server dan filter pencarian
+      function searchCampaigns() {
+        const server = document.getElementById("server_select").value;
+        const filter = document
+          .getElementById("campaign_filter")
+          .value.toLowerCase();
+
+        const campaignDropdown = document.getElementById("campaign_select");
+        campaignDropdown.innerHTML = ""; // Kosongkan dropdown sebelum mengisi ulang
+
+        if (server && campaignsData[server]) {
+          const filteredCampaigns = campaignsData[server].filter((campaign) =>
+            campaign.toLowerCase().includes(filter)
+          );
+
+          if (filteredCampaigns.length > 0) {
+            filteredCampaigns.forEach((campaign) => {
+              const option = document.createElement("option");
+              option.value = campaign;
+              option.textContent = campaign;
+              campaignDropdown.appendChild(option);
+            });
+          } else {
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "Tidak ada kampanye ditemukan";
+            campaignDropdown.appendChild(option);
+          }
+        }
+      }
+
+      // Fungsi untuk menambahkan call list ke dalam tabel
+      let callListIndex = 1; // Mulai nomor urut call list dari 1
+      function addCallList() {
+        const selectedCallList =
+          document.getElementById("select_call_list").value;
+        const totalContact = callListsData[selectedCallList].totalContact;
+        const addMasking = document.getElementById("add_masking").checked;
+
+        // Validasi inputan
+        if (!selectedCallList) {
+          alert("Pilih Call List terlebih dahulu.");
+          return;
+        }
+
+        // Menambahkan baris ke tabel
+        const table = document.getElementById("call_list_table");
+        const row = table.insertRow();
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+        const cell3 = row.insertCell(2);
+        const cell4 = row.insertCell(3);
+
+        cell1.textContent = callListIndex++;
+        cell2.textContent = selectedCallList;
+        cell3.textContent = totalContact;
+        cell4.textContent = addMasking ? "Ya" : "Tidak";
+
+        // Mengosongkan input setelah menambahkan
+        document.getElementById("select_call_list").value = "";
+        document.getElementById("add_masking").checked = false;
+      }
+
+      // Update label total contact ketika call list dipilih
+      function updateTotalContact() {
+        const selectedCallList =
+          document.getElementById("select_call_list").value;
+        const totalContactLabel = document.getElementById(
+          "total_contact_label"
+        );
+
+        if (selectedCallList && callListsData[selectedCallList]) {
+          totalContactLabel.textContent =
+            callListsData[selectedCallList].totalContact;
+        } else {
+          totalContactLabel.textContent = "0";
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center mb-4">
+        Unggah Call List INCITEL ke Kampanye CXOne
+      </h1>
+      <form
+        action="upload_call_list.php"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <!-- Kelompokkan bagian CXOne -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Informasi Kampanye CXOne</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-4">
+                <!-- Pilih Server CXOne -->
+                <div class="form-group">
+                  <label for="server_select">Pilih Server CXOne:</label>
+                  <select
+                    id="server_select"
+                    name="server"
+                    class="form-control"
+                    required
+                    onchange="searchCampaigns()"
+                  >
+                    <option value="">Pilih Server</option>
+                    <option value="server1">Server 1</option>
+                    <option value="server2">Server 2</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-8">
+                <!-- Filter Pencarian Kampanye dan Tombol Cari Kampanye (dalam input-group) -->
+                <div class="form-group">
+                  <label for="campaign_filter"
+                    >Filter Pencarian Kampanye:</label
+                  >
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      id="campaign_filter"
+                      name="campaign_filter"
+                      class="form-control"
+                      placeholder="Masukkan kata kunci"
+                      oninput="searchCampaigns()"
+                    />
+                    <div class="input-group-append">
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="searchCampaigns()"
+                      >
+                        Cari Kampanye
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                    <!-- Pilih Kampanye dari Daftar -->
+            <div class="form-group">
+                <label for="campaign_select">Pilih Kampanye:</label>
+                <select
+                  id="campaign_select"
+                  name="campaign_name"
+                  class="form-control"
+                  required
+                >
+                  <option value="">Pilih Kampanye</option>
+                </select>
+              </div>
+              </div>
+            </div>
+
+            
+          </div>
+        </div>
+
+        <!-- Call List INCITEL -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Call List INCITEL</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <!-- Filter Call List dan tombol search dalam satu row -->
+            <div class="form-group row">
+                <div class="col-md-8">
+                  <label for="call_list_name">Filter Call List:</label>
+                  <input
+                    type="text"
+                    id="call_list_name"
+                    name="call_list_name"
+                    class="form-control"
+                    placeholder="Masukkan filter call list"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label>&nbsp;</label>
+                  <button
+                    type="button"
+                    class="btn btn-primary form-control"
+                    onclick="searchCampaigns()"
+                  >
+                    Search Call List
+                  </button>
+                </div>
+              </div>
+                </div>
+            </div>
+            
+            <!-- Pilih Call List, Total Contact dan Checkbox Masking dalam satu row -->
+            <div class="form-group row">
+              <div class="col-md-4">
+                <label for="select_call_list">Pilih Call List:</label>
+                <select
+                  id="select_call_list"
+                  name="select_call_list"
+                  class="form-control"
+                  onchange="updateTotalContact()"
+                >
+                  <option value="">Pilih Call List</option>
+                  <option value="call_list_1">Call List 1</option>
+                  <option value="call_list_2">Call List 2</option>
+                  <option value="call_list_3">Call List 3</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="total_contact_label">Total Contact:</label>
+                <label
+                  id="total_contact_label"
+                  class="form-control"
+                  style="border: 1px solid #ccc; padding: 6px 12px"
+                  >0</label
+                >
+              </div>
+              <div class="col-md-4">
+                <label class="form-check-label" for="add_masking">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="add_masking"
+                    name="add_masking"
+                  />
+                  Tambahkan Masking Nomor Telepon
+                </label>
+              </div>
+            </div>
+
+            <!-- Tombol Add Call List -->
+            <div class="form-group">
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="addCallList()"
+              >
+                Tambah Call List
+              </button>
+            </div>
+
+            <!-- Tabel untuk Menampilkan Call List -->
+            <div class="form-group">
+              <table id="call_list_table" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>No.</th>
+                    <th>Nama Call List</th>
+                    <th>Total Kontak</th>
+                    <th>Masking</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Data Call List yang ditambahkan akan muncul di sini -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Komentar (Opsional) -->
+        <div class="form-group">
+          <label for="comments">Komentar (Opsional):</label>
+          <textarea
+            id="comments"
+            name="comments"
+            class="form-control"
+            rows="4"
+            placeholder="Masukkan komentar atau catatan (opsional)"
+          ></textarea>
+        </div>
+
+        <!-- Tombol Submit -->
+        <div class="form-group text-center float-right">
+          <!-- Tombol untuk API -->
+          <button type="submit" class="btn btn-primary">
+            Submit Call List to CXOne(API)
+          </button>
+          <!-- Tombol untuk CSV File, diatur di kanan -->
+          <button type="button" class="btn btn-secondary">
+            Submit Call List to CXOne(.csv)
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
