@@ -77,15 +77,30 @@
         const cell2 = row.insertCell(1);
         const cell3 = row.insertCell(2);
         const cell4 = row.insertCell(3);
+        const cell5 = row.insertCell(4); // Action column
 
         cell1.textContent = callListIndex++;
         cell2.textContent = selectedCallList;
         cell3.textContent = totalContact;
         cell4.textContent = addMasking ? "Yes" : "No";
+        
+        // Create Delete button and append to the Action column
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "btn btn-danger btn-sm";
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function () {
+          deleteCallList(row);
+        };
+        cell5.appendChild(deleteButton);
 
         // Clear inputs after adding
         document.getElementById("select_call_list").value = "";
         document.getElementById("add_masking").checked = false;
+      }
+
+      // Function to delete a call list row from the table
+      function deleteCallList(row) {
+        row.parentNode.removeChild(row);
       }
 
       // Update the total contact label when a call list is selected
@@ -179,8 +194,6 @@
               </div>
               </div>
             </div>
-
-            
           </div>
         </div>
 
@@ -276,10 +289,11 @@
                     <th>Call List Name</th>
                     <th>Total Contacts</th>
                     <th>Masking</th>
+                    <th>Action</th> <!-- Added Action column -->
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- Added Call List data will appear here -->
+                  <!-- Added call list data will appear here -->
                 </tbody>
               </table>
             </div>
